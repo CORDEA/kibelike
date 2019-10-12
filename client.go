@@ -24,7 +24,9 @@ type SearchResultResponse struct {
 		Nodes []struct {
 			Title    string
 			Document struct {
-				ID string
+				ID      string
+				Title   string
+				Content string
 			}
 		}
 	}
@@ -87,9 +89,11 @@ func (c *Client) Search(query string) (SearchResultResponse, error) {
 						__typename
 						... on Comment {
 							id
+							content
 						}
 						... on Note {
 							id
+							title
 						}
 					}
 					title
