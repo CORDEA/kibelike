@@ -19,6 +19,17 @@ type Response struct {
 	}
 }
 
+type SearchResultResponse struct {
+	Search struct {
+		Nodes []struct {
+			Title    string
+			Document struct {
+				ID string
+			}
+		}
+	}
+}
+
 func NewClient(endpoint string, token string) *Client {
 	return &Client{
 		client: graphql.NewClient(endpoint),
@@ -63,6 +74,35 @@ func (c *Client) GetNotes() (Response, error) {
 
 	ctx := context.Background()
 	resp := Response{}
+	err := c.client.Run(ctx, req, &resp)
+	return resp, err
+}
+
+func (c *Client) Search(query string) (SearchResultResponse, error) {
+	req := graphql.NewRequest(`
+		query ($first: Int!, $query: String!) {
+			search(first: $first, query: $query) {
+				nodes {
+					document {
+						__typename
+						... on Comment {
+							id
+						}
+						... on Note {
+							id
+						}
+					}
+					title
+				}
+			}
+		}
+	`)
+	req.Var("first", 5)
+	req.Var("query", query)
+	c.applyHeader(req)
+
+	ctx := context.Background()
+	resp := SearchResultResponse{}
 	err := c.client.Run(ctx, req, &resp)
 	return resp, err
 }
