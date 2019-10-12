@@ -7,23 +7,32 @@ import (
 
 type Client struct {
 	client *graphql.Client
-	Token string
+	Token  string
+}
+
+type Response struct {
+	Notes struct {
+		Nodes []struct {
+			ID    string
+			Title string
+		}
+	}
 }
 
 func NewClient(endpoint string, token string) *Client {
 	return &Client{
-		client:graphql.NewClient(endpoint),
-		Token:token,
+		client: graphql.NewClient(endpoint),
+		Token:  token,
 	}
 }
 
 func (c *Client) applyHeader(req *graphql.Request) {
-	req.Header.Add("Authorization", "Bearer " + c.Token)
+	req.Header.Add("Authorization", "Bearer "+c.Token)
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
 }
 
-func (c *Client) Like(id string) error  {
+func (c *Client) Like(id string) error {
 	req := graphql.NewRequest(`
 		mutation Like($id: ID!) {
 			like(input: {likableId: $id}) {
@@ -36,4 +45,24 @@ func (c *Client) Like(id string) error  {
 
 	ctx := context.Background()
 	return c.client.Run(ctx, req, nil)
+}
+
+func (c *Client) GetNotes() (Response, error) {
+	req := graphql.NewRequest(`
+		query ($first: Int!) {
+			notes(first: $first) {
+				nodes {
+					id
+					title
+				}
+			}
+		}
+	`)
+	req.Var("first", 5)
+	c.applyHeader(req)
+
+	ctx := context.Background()
+	resp := Response{}
+	err := c.client.Run(ctx, req, &resp)
+	return resp, err
 }
