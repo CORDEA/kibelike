@@ -10,7 +10,7 @@ type Client struct {
 	Token  string
 }
 
-type Response struct {
+type NotesResponse struct {
 	Notes struct {
 		Nodes []struct {
 			ID    string
@@ -58,7 +58,7 @@ func (c *Client) Like(id string) error {
 	return c.client.Run(ctx, req, nil)
 }
 
-func (c *Client) GetNotes() (Response, error) {
+func (c *Client) GetNotes() (NotesResponse, error) {
 	req := graphql.NewRequest(`
 		query ($first: Int!) {
 			notes(first: $first) {
@@ -73,7 +73,7 @@ func (c *Client) GetNotes() (Response, error) {
 	c.applyHeader(req)
 
 	ctx := context.Background()
-	resp := Response{}
+	resp := NotesResponse{}
 	err := c.client.Run(ctx, req, &resp)
 	return resp, err
 }
