@@ -20,6 +20,7 @@ func main() {
 	subcommands.Register(&SearchCmd{client: client}, "")
 	subcommands.Register(&ListCmd{client: client}, "")
 	subcommands.Register(&LikeCmd{client: client}, "")
+	subcommands.Register(&UnlikeCmd{client: client}, "")
 	flag.Parse()
 	ctx := context.Background()
 	os.Exit(int(subcommands.Execute(ctx)))
