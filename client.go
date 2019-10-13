@@ -60,6 +60,21 @@ func (c *Client) Like(id string) error {
 	return c.client.Run(ctx, req, nil)
 }
 
+func (c *Client) Unlike(id string) error {
+	req := graphql.NewRequest(`
+		mutation Unlike($id: ID!) {
+			unlike(input: {likableId: $id}) {
+				clientMutationId
+			}
+		}
+	`)
+	req.Var("id", id)
+	c.applyHeader(req)
+
+	ctx := context.Background()
+	return c.client.Run(ctx, req, nil)
+}
+
 func (c *Client) GetNotes() (NotesResponse, error) {
 	req := graphql.NewRequest(`
 		query ($first: Int!) {
