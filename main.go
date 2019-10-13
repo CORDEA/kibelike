@@ -18,6 +18,7 @@ func main() {
 	client := NewClient("https://"+org+".kibe.la/api/v1", token)
 
 	subcommands.Register(&SearchCmd{client: client}, "")
+	subcommands.Register(&ListCmd{client: client}, "")
 	flag.Parse()
 	ctx := context.Background()
 	os.Exit(int(subcommands.Execute(ctx)))
