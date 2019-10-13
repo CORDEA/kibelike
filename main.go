@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"flag"
+	"github.com/google/subcommands"
 	"github.com/joho/godotenv"
 	"log"
 	"os"
@@ -13,4 +16,9 @@ func main() {
 	org := os.Getenv("ORG")
 	token := os.Getenv("TOKEN")
 	client := NewClient("https://"+org+".kibe.la/api/v1", token)
+
+	subcommands.Register(&SearchCmd{client: client}, "")
+	flag.Parse()
+	ctx := context.Background()
+	os.Exit(int(subcommands.Execute(ctx)))
 }
